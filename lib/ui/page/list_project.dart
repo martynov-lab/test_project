@@ -1,23 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_project/models/project_model.dart';
-
 import '../../business/bloc/search_bloc_bloc.dart';
 import 'git_hub_view.dart';
 
-class ListProject extends StatefulWidget {
+class ListProject extends StatelessWidget {
   const ListProject({Key? key}) : super(key: key);
 
   @override
-  State<ListProject> createState() => _ListProjectState();
-}
-
-class _ListProjectState extends State<ListProject> {
-  @override
   Widget build(BuildContext context) {
+    Widget textInfo(String name, String value) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(name,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey[900],
+                  fontWeight: FontWeight.w400)),
+          Text(value,
+              style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w300)),
+        ],
+      );
+    }
+
     return BlocBuilder<SearchBlocBloc, SearchBlocState>(
         builder: (context, state) {
       List<ProjectModel> projectList = [];
+
       if (state is ProjectEmptyState) {
         return const Center(
           child: Text(
@@ -30,7 +44,15 @@ class _ListProjectState extends State<ListProject> {
         return const Center(child: CircularProgressIndicator());
       }
       if (state is ProjectLoadedState) {
-        projectList = state.projects;
+        projectList = state.projectsList;
+      }
+      if (state is ProjectErrorState) {
+        return const Center(
+          child: Text(
+            'Nothing found...',
+            style: TextStyle(fontSize: 20.0),
+          ),
+        );
       }
       return ListView.builder(
           padding: const EdgeInsets.all(8),
@@ -50,65 +72,36 @@ class _ListProjectState extends State<ListProject> {
                   padding: const EdgeInsets.all(5.0),
                   child: Column(
                     children: <Widget>[
-                      Text(projectList[index].name,
-                          style: const TextStyle(fontSize: 18)),
-                      const SizedBox(
-                        height: 10,
-                      ),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Container(
-                            child: CircleAvatar(
-                                backgroundImage: NetworkImage(
-                                    '${projectList[index].avatar}')),
+                          SizedBox(
+                            width: 100,
+                            child: Image.network(projectList[index].avatar),
                           ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
+                          Expanded(
+                            child: Container(
+                              padding:
+                                  const EdgeInsets.only(left: 10, right: 10),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.max,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Автор: ',
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.grey[800],
-                                          fontWeight: FontWeight.bold)),
-                                  Text(projectList[index].login,
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.grey[600])),
+                                  Text(projectList[index].name,
+                                      softWrap: false,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      )),
+                                  textInfo('Автор: ', projectList[index].login),
+                                  textInfo('Просмотров: ',
+                                      "${projectList[index].watchersCount}"),
+                                  textInfo('Звезд: ',
+                                      "${projectList[index].stargazersCount}"),
                                 ],
                               ),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Просмотров: ',
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.grey[800],
-                                          fontWeight: FontWeight.bold)),
-                                  Text("${projectList[index].stargazersCount}",
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.grey[600])),
-                                ],
-                              ),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Звезд: ',
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.grey[800],
-                                          fontWeight: FontWeight.bold)),
-                                  Text("${projectList[index].stargazersCount}",
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.grey[600])),
-                                ],
-                              ),
-                            ],
+                            ),
                           ),
                         ],
                       ),

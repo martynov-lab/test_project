@@ -12,12 +12,19 @@ class ProjectEmptyState extends SearchBlocState {}
 class ProjectLoadingState extends SearchBlocState {}
 
 class ProjectLoadedState extends SearchBlocState {
-  final List<ProjectModel> projects;
+  final List<ProjectModel> projectsList;
 
-  const ProjectLoadedState({required this.projects});
+  const ProjectLoadedState({required this.projectsList});
 
   @override
-  List<Object> get props => [projects];
+  List<Object> get props => [projectsList];
 }
 
-class ProjectErrorState extends SearchBlocState {}
+class ProjectErrorState extends SearchBlocState {
+  final String message;
+
+  const ProjectErrorState({required this.message});
+
+  @override
+  List<Object> get props => [message];
+}

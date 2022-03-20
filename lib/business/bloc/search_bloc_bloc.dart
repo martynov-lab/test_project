@@ -11,14 +11,16 @@ class SearchBlocBloc extends Bloc<SearchProjectEvent, SearchBlocState> {
   final ProjectRepository projectRepository;
   SearchBlocBloc({required this.projectRepository})
       : super(ProjectEmptyState()) {
-    on<SearchProjectEvent>((event, emit) async {
-      if (event is SearchProject) {
-        emit(ProjectLoadingState());
+    on<SearchProject>((event, emit) async {
+      emit(ProjectLoadingState());
 
-        final projectsList =
-            await projectRepository.searchProject(event.projectQuery);
-
-        emit(ProjectLoadedState(projects: projectsList));
+      try {
+        var _loadedProjects = <ProjectModel>[];
+        _loadedProjects = await projectRepository.searchProject(
+            event.query, event.page, event.limit);
+        emit(ProjectLoadedState(projectsList: _loadedProjects));
+      } catch (e) {
+        emit(ProjectErrorState(message: '$e'));
       }
     });
   }

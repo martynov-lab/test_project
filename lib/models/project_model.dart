@@ -28,7 +28,7 @@ class ProjectModel {
       watchersCount: json["watchers_count"],
       login: json['owner']['login'] as String,
       avatar: json['owner']['avatar_url'] as String,
-      urlGitHub: json['owner']['url'] as String,
+      urlGitHub: json['owner']['html_url'] as String,
     );
   }
 }
